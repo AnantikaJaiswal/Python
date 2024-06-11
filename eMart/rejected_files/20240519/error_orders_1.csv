@@ -1,0 +1,4 @@
+order_id,order_date,product_id,quantity,sales,city,reason
+1,01-01-2023,100,1,50000,,"['Location is not correct', 'city is empty']"
+3,03-01-2023,200,2,9000,Bumbai,['Location is not correct']
+4,04-12-2024,800,3,30000,Bangalore,"['Order Date is from future', 'product not exists', 'price not accurate']"

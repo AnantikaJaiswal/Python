@@ -1,0 +1,61 @@
+Note : Read the iphone.csv dataset to data dataframe and answer questions.
+
+import pandas as pd
+data = pd.read_csv('iphone.csv')
+
+1 - The column names have spaces . rename the column names to have underscore '_' instead of space (try to do in one go instead of specifying each column nam in rename method)
+data.columns.str.replace(' ','_')
+data
+
+2- start rating for some of the models is missing in the dataset. fill those missing values with the average rating all the models.
+avg_star_rating = (data['Star_Rating']).mean(skipna=True)
+data.fillna({'Star_Rating':avg_star_rating},inplace=True)   
+data   
+avg_star_rating
+
+3- Now instead of filling missing values with avg rating of full dataset , fill with avg rating based on RAM. example :  if rating for a 2 gb phone is missing then take average of all other 2 gb phones rating and fill that value. 
+fc = (data['Ram']=='2 GB')
+data_2GB = data[fc]
+data_2GB_avg = (data_2GB['Star_Rating'].sum()/data_2GB['Star_Rating'].count())
+data.loc[fc,'Star_Rating']=data_2GB_avg
+data
+
+4- create a new column in the dataframe "Discount_Percentage" based on MRP and sale value
+data['discount_percentage'] = round(((data['Mrp']-data['Sale_Price'])/data['Mrp'])*100,2)
+data
+
+5- which model has highest percent discount ?
+sorted_data = data.sort_values(by='Discount_Percentage', ascending=False)
+model_with_highest_discount = sorted_data.iloc[0]['Product Name']
+
+6.find total no of models  each space configuration (128 GB , 64 GB etc)
+split_name = data['Product_Name'].str.split(",")
+split_size = split_name.str[1][1:-1]
+space_size = split_size.str[1:-1]
+data['space_size'] = space_size
+data.groupby('space_size')['Product_Name'].count()
+
+7- list top 5 models having highest no of reviews 
+model_reviews = data.groupby('Product_Name')['Number_Of_Reviews'].sum()
+model_reviews_DF = pd.DataFrame({'Models':model_reviews.index,'Reviews':model_reviews.values})
+model_reviews_DF.sort_values(by='Reviews',ascending=False,inplace=True)
+model_reviews_DF.head(5)
+
+8 - what is the price diffrence between highest price and lowest price iphone (based on mrp)
+price_diff = data['Mrp'].max()-data['Mrp'].min()
+price_diff
+
+9 - find total no of reviews for iphone 11 and iphone 12 category . Output should have only 2 rows (for 11 and 12).
+split_name = data['Product_Name'].str.split("(")
+data['model_name'] = split_name.str[0]
+model_11_12 = data['model_name'=='APPLE iPhone 11' or 'model_name'=='APPLE iPhone 12']
+data.groupby('model_name')['Number_Of_Reviews'].count()
+
+10- which iphone has 3rd highest MRP
+mrp = data.sort_values(by='Mrp', ascending=False)
+mrp.head(3).min()
+
+11- what is the average mrp of iphones which costs above 100,000
+fc = data['Mrp']>=100000
+data[fc]['Mrp'].mean()
+
